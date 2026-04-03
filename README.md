@@ -21,18 +21,61 @@ For a complete guide on daily usage — invoking skills, using agents, typical w
 git clone https://github.com/ernesto2108/forge.git ~/projects/forge
 cd ~/projects/forge
 
-# 2. Choose your targets (which tools to deploy to)
-./forge-cli targets claude opencode    # or: all
+# 2. Make the CLI available globally (pick one)
+# Option A: symlink (recommended)
+ln -sf ~/projects/forge/forge-cli /usr/local/bin/forge
 
-# 3. Choose your provider (model tier mapping)
-./forge-cli provider claude            # or: gemini, local
+# Option B: alias in your shell profile (~/.zshrc or ~/.bashrc)
+echo 'alias forge="~/projects/forge/forge-cli"' >> ~/.zshrc
+source ~/.zshrc
 
-# 4. Deploy
-./forge-cli deploy
+# 3. Choose your targets (which tools to deploy to)
+forge targets claude opencode    # or: all
 
-# 5. Verify
-./forge-cli status
+# 4. Choose your provider (model tier mapping)
+forge provider claude            # or: gemini, local
+
+# 5. Deploy
+forge deploy
+
+# 6. Verify
+forge status
 ```
+
+> After step 2, you can run `forge` from anywhere. If you skip it, use `./forge-cli` from the forge directory.
+
+## How It Works
+
+```mermaid
+flowchart TD
+    User([User]) -->|describes task| Orch[Orchestrator]
+    Orch -->|triage| Decision{Complexity?}
+
+    Decision -->|Trivial 1-2 files| Direct[Direct execution]
+    Decision -->|Medium 3-8 files| Pipeline1[Developer → Tester → QA]
+    Decision -->|Large 8+ files| Pipeline2[Full pipeline]
+
+    Pipeline2 --> PM[PM agent]
+    PM -->|PRD| Arch[Architect agent]
+    Arch -->|design.md| Des[Designer agent]
+    Des -->|ui-spec.md| Dev[Developer agent]
+    Dev -->|code| Test[Tester agent]
+    Test -->|tests| QA[QA agent]
+    QA -->|score >= 7?| Gate{Quality Gate}
+    Gate -->|Pass| Rep[Reporter agent]
+    Gate -->|Fail| Dev
+
+    style Orch fill:#6366f1,color:#fff
+    style Gate fill:#f59e0b,color:#000
+    style Direct fill:#10b981,color:#fff
+```
+
+Each agent has strict boundaries:
+- **developer** writes production code only
+- **tester** writes test files only
+- **dba** manages migrations only
+- **devops** manages infra/CI only
+- Agents never cross boundaries
 
 ## Project Structure
 

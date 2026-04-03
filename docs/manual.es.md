@@ -14,20 +14,20 @@ git clone https://github.com/ernesto2108/forge.git ~/projects/forge
 cd ~/projects/forge
 
 # Elegir que herramientas de IA usas
-./forge-cli targets claude              # Solo Claude Code
-./forge-cli targets claude opencode     # Claude + OpenCode
-./forge-cli targets all                 # Todas
+forge targets claude              # Solo Claude Code
+forge targets claude opencode     # Claude + OpenCode
+forge targets all                 # Todas
 
 # Elegir proveedor de modelos
-./forge-cli provider claude             # Anthropic (Claude)
-./forge-cli provider gemini             # Google (Gemini)
-./forge-cli provider local              # Ollama/local
+forge provider claude             # Anthropic (Claude)
+forge provider gemini             # Google (Gemini)
+forge provider local              # Ollama/local
 
 # Desplegar
-./forge-cli deploy
+forge deploy
 
 # Verificar
-./forge-cli status
+forge status
 ```
 
 Despues de `deploy`, tus herramientas de IA ya tienen acceso a todos los agentes y skills.
@@ -265,33 +265,33 @@ Ahora todos los agentes saben donde leer y escribir documentacion para ese proye
 ```bash
 cd ~/projects/forge
 git pull
-./forge-cli deploy
+forge deploy
 ```
 
 ### Ver que esta desplegado
 
 ```bash
-./forge-cli status
+forge status
 ```
 
 ### Cambiar de proveedor de IA
 
 ```bash
-./forge-cli provider gemini    # Cambia modelos a Gemini
-./forge-cli deploy             # Redesplegar con nuevos modelos
+forge provider gemini    # Cambia modelos a Gemini
+forge deploy             # Redesplegar con nuevos modelos
 ```
 
 ### Fijar una skill a una version
 
 ```bash
-./forge-cli pin skills/go-conventions v1.2.0
-./forge-cli unpin skills/go-conventions    # Volver a HEAD
+forge pin skills/go-conventions v1.2.0
+forge unpin skills/go-conventions    # Volver a HEAD
 ```
 
 ### Desinstalar
 
 ```bash
-./forge-cli uninstall    # Limpia forge y restaura archivos originales
+forge uninstall    # Limpia forge y restaura archivos originales
 ```
 
 ---

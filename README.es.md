@@ -21,18 +21,61 @@ Para una guia completa de como usar Forge en el dia a dia — invocar skills, us
 git clone https://github.com/ernesto2108/forge.git ~/projects/forge
 cd ~/projects/forge
 
-# 2. Elegir targets (a que herramientas desplegar)
-./forge-cli targets claude opencode    # o: all
+# 2. Hacer el CLI disponible globalmente (elige uno)
+# Opcion A: symlink (recomendado)
+ln -sf ~/projects/forge/forge-cli /usr/local/bin/forge
 
-# 3. Elegir provider (mapeo de modelos)
-./forge-cli provider claude            # o: gemini, local
+# Opcion B: alias en tu perfil de shell (~/.zshrc o ~/.bashrc)
+echo 'alias forge="~/projects/forge/forge-cli"' >> ~/.zshrc
+source ~/.zshrc
 
-# 4. Desplegar
-./forge-cli deploy
+# 3. Elegir targets (a que herramientas desplegar)
+forge targets claude opencode    # o: all
 
-# 5. Verificar
-./forge-cli status
+# 4. Elegir provider (mapeo de modelos)
+forge provider claude            # o: gemini, local
+
+# 5. Desplegar
+forge deploy
+
+# 6. Verificar
+forge status
 ```
+
+> Despues del paso 2, puedes ejecutar `forge` desde cualquier lugar. Si lo omites, usa `./forge-cli` desde el directorio de forge.
+
+## Como Funciona
+
+```mermaid
+flowchart TD
+    User([Usuario]) -->|describe tarea| Orch[Orquestador]
+    Orch -->|clasifica| Decision{Complejidad?}
+
+    Decision -->|Trivial 1-2 archivos| Direct[Ejecucion directa]
+    Decision -->|Media 3-8 archivos| Pipeline1[Developer → Tester → QA]
+    Decision -->|Alta 8+ archivos| Pipeline2[Pipeline completo]
+
+    Pipeline2 --> PM[Agente PM]
+    PM -->|PRD| Arch[Agente Architect]
+    Arch -->|design.md| Des[Agente Designer]
+    Des -->|ui-spec.md| Dev[Agente Developer]
+    Dev -->|codigo| Test[Agente Tester]
+    Test -->|tests| QA[Agente QA]
+    QA -->|score >= 7?| Gate{Quality Gate}
+    Gate -->|Pasa| Rep[Agente Reporter]
+    Gate -->|Falla| Dev
+
+    style Orch fill:#6366f1,color:#fff
+    style Gate fill:#f59e0b,color:#000
+    style Direct fill:#10b981,color:#fff
+```
+
+Cada agente tiene limites estrictos:
+- **developer** solo escribe codigo de produccion
+- **tester** solo escribe archivos de test
+- **dba** solo gestiona migraciones
+- **devops** solo gestiona infra/CI
+- Los agentes nunca cruzan limites
 
 ## Estructura del Proyecto
 

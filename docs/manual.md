@@ -14,20 +14,20 @@ git clone https://github.com/ernesto2108/forge.git ~/projects/forge
 cd ~/projects/forge
 
 # Choose which AI tools you use
-./forge-cli targets claude              # Claude Code only
-./forge-cli targets claude opencode     # Claude + OpenCode
-./forge-cli targets all                 # All tools
+forge targets claude              # Claude Code only
+forge targets claude opencode     # Claude + OpenCode
+forge targets all                 # All tools
 
 # Choose model provider
-./forge-cli provider claude             # Anthropic (Claude)
-./forge-cli provider gemini             # Google (Gemini)
-./forge-cli provider local              # Ollama/local
+forge provider claude             # Anthropic (Claude)
+forge provider gemini             # Google (Gemini)
+forge provider local              # Ollama/local
 
 # Deploy
-./forge-cli deploy
+forge deploy
 
 # Verify
-./forge-cli status
+forge status
 ```
 
 After `deploy`, your AI tools have access to all agents and skills.
@@ -265,33 +265,33 @@ Now all agents know where to read and write documentation for that project.
 ```bash
 cd ~/projects/forge
 git pull
-./forge-cli deploy
+forge deploy
 ```
 
 ### Check what's deployed
 
 ```bash
-./forge-cli status
+forge status
 ```
 
 ### Change AI provider
 
 ```bash
-./forge-cli provider gemini    # Switch models to Gemini
-./forge-cli deploy             # Redeploy with new models
+forge provider gemini    # Switch models to Gemini
+forge deploy             # Redeploy with new models
 ```
 
 ### Pin a skill to a version
 
 ```bash
-./forge-cli pin skills/go-conventions v1.2.0
-./forge-cli unpin skills/go-conventions    # Back to HEAD
+forge pin skills/go-conventions v1.2.0
+forge unpin skills/go-conventions    # Back to HEAD
 ```
 
 ### Uninstall
 
 ```bash
-./forge-cli uninstall    # Clean forge and restore original files
+forge uninstall    # Clean forge and restore original files
 ```
 
 ---
