@@ -1,178 +1,177 @@
+[Leer en espanol](README.es.md)
+
 # Forge
 
-Sistema de orquestacion de agentes IA. Define agentes, skills y convenciones una sola vez — despliega a Claude Code, OpenCode, Gemini CLI, Codex y Cursor. Compatible con el estandar abierto [AGENTS.md](https://agents.md/).
+AI agent orchestration system. Define agents, skills, and conventions once — deploy to Claude Code, OpenCode, Gemini CLI, Codex, and Cursor. Compatible with the [AGENTS.md](https://agents.md/) open standard.
 
-## Que es Forge?
+## What is Forge?
 
-Forge es una coleccion de **agentes** (roles especializados de IA), **skills** (conocimiento de dominio y convenciones) y un **CLI** que los despliega a tus herramientas de desarrollo con IA. Escribes tus agentes y skills en markdown, ejecutas `forge deploy`, y cada herramienta recibe el mismo conocimiento.
+Forge is a collection of **agents** (specialized AI roles), **skills** (domain knowledge and conventions), and a **CLI** that deploys them to your AI coding tools. Write your agents and skills in markdown, run `forge deploy`, and every tool gets the same knowledge.
 
-Forge genera automaticamente un archivo `AGENTS.md` en la raiz del proyecto — el [estandar abierto](https://agents.md/) mantenido por la Linux Foundation y adoptado por Codex, Cursor, Copilot y otros.
+Forge automatically generates an `AGENTS.md` file — the [open standard](https://agents.md/) maintained by the Linux Foundation and adopted by Codex, Cursor, Copilot, and others.
 
-## Manual de Uso
+## User Manual
 
-Para una guia completa de como usar Forge en el dia a dia — invocar skills, usar agentes, flujos de trabajo tipicos, convenciones por stack y tips — lee el **[Manual de Uso](docs/manual-de-uso.md)**.
+For a complete guide on daily usage — invoking skills, using agents, typical workflows, per-stack conventions, and tips — read the **[User Manual](docs/manual.md)**.
 
-## Inicio Rapido
+## Quick Start
 
 ```bash
-# 1. Clonar
+# 1. Clone
 git clone https://github.com/ernesto2108/forge.git ~/projects/forge
 cd ~/projects/forge
 
-# 2. Elegir targets (a que herramientas desplegar)
-./forge-cli targets claude opencode    # o: all
+# 2. Choose your targets (which tools to deploy to)
+./forge-cli targets claude opencode    # or: all
 
-# 3. Elegir provider (mapeo de modelos)
-./forge-cli provider claude            # o: gemini, local
+# 3. Choose your provider (model tier mapping)
+./forge-cli provider claude            # or: gemini, local
 
-# 4. Desplegar
+# 4. Deploy
 ./forge-cli deploy
 
-# 5. Verificar
+# 5. Verify
 ./forge-cli status
 ```
 
-## Estructura del Proyecto
+## Project Structure
 
 ```
 forge/
-├── forge-cli              # CLI de despliegue (bash)
-├── forge.yaml             # Manifiesto de despliegue (targets, componentes)
-├── forge.config.yaml      # Mapeo de proveedores y modelos
-├── AGENTS.md              # Auto-generado — estandar abierto para herramientas IA
-├── agents/                # 12 agentes especializados
-├── skills/                # 38 skills de dominio y convenciones
-├── commands/              # Comandos invocables por el usuario
-├── docs/                  # Documentacion interna
-├── examples/              # Template de CLAUDE.md para proyectos
-└── vault-template/        # Template de vault Obsidian para documentacion
+├── forge-cli              # Deployment CLI (bash)
+├── forge.yaml             # Deployment manifest (targets, components)
+├── forge.config.yaml      # Provider & model mapping
+├── agents/                # 12 specialized agent definitions
+├── skills/                # 38 domain skills and conventions
+├── commands/              # User-invocable slash commands
+├── docs/                  # Documentation (en + es)
+├── examples/              # CLAUDE.md template for projects
+└── vault-template/        # Obsidian vault template for documentation
 ```
 
-## Agentes
+## Agents
 
-Cada agente es un archivo markdown con frontmatter YAML que define su rol, permisos y nivel de modelo.
+Each agent is a markdown file with YAML frontmatter defining its role, permissions, and model tier.
 
-| Agente | Rol | Permiso | Nivel |
-|--------|-----|---------|-------|
-| **pm** | Requisitos, PRDs, backlog, planificacion de sprints | write | high |
-| **architect** | Diseno de sistema, contratos API, ADRs | write | high |
-| **designer** | Diseno UX/UI, design system, flujos de usuario | write | high |
-| **developer** | Codigo de produccion (Go, React, Flutter, Astro) | execute | medium |
-| **tester** | Archivos de test en todos los stacks | execute | medium |
-| **dba** | Migraciones, diseno de schema, optimizacion de queries | execute | medium |
-| **devops** | CI/CD, Docker, Terraform, K8s, infra cloud | execute | medium |
-| **qa** | Code review, quality gate (bloquea si score < 7) | execute | medium |
-| **security** | SAST, SCA, auditoria de secretos, revision de auth | execute | medium |
-| **scanner** | Escaneo de repositorio, generacion de contexto | execute | medium |
-| **tech-writer** | Documentacion, README, API docs, changelogs | write | medium |
-| **reporter** | Reportes de ejecucion de sesion | execute | low |
+| Agent | Role | Permission | Tier |
+|-------|------|------------|------|
+| **pm** | Requirements, PRDs, backlog, sprint planning | write | high |
+| **architect** | System design, API contracts, ADRs | write | high |
+| **designer** | UX/UI design, design system, user flows | write | high |
+| **developer** | Production code (Go, React, Flutter, Astro) | execute | medium |
+| **tester** | Test files across all stacks | execute | medium |
+| **dba** | Migrations, schema design, query optimization | execute | medium |
+| **devops** | CI/CD, Docker, Terraform, K8s, cloud infra | execute | medium |
+| **qa** | Code review, quality gate (blocks if score < 7) | execute | medium |
+| **security** | SAST, SCA, secrets audit, auth review | execute | medium |
+| **scanner** | Repository scanning, project context generation | execute | medium |
+| **tech-writer** | Documentation, README, API docs, changelogs | write | medium |
+| **reporter** | Session execution reports | execute | low |
 
-### Como funcionan los agentes
+### How agents work
 
-- El orquestador (tu o `/orchestrate`) clasifica la complejidad de la tarea
-- **Trivial**: se ejecuta directo, sin agentes
-- **Medium+**: los agentes corren en secuencia con gates entre fases
-- Cada agente tiene limites estrictos — developer no toca tests, tester no toca codigo de produccion
+- The orchestrator (you or `/orchestrate`) triages task complexity
+- **Trivial** tasks: execute directly, no agents
+- **Medium+**: agents run in sequence with gates between phases
+- Each agent has strict boundaries — developer can't touch tests, tester can't touch production code
 
-### Permisos
+### Permissions
 
-| Nivel | Herramientas disponibles |
-|-------|-------------------------|
+| Level | Available tools |
+|-------|----------------|
 | **read** | Glob, Grep, LS, Read |
 | **write** | + Write, Edit |
 | **execute** | + Bash |
 
-### Niveles de modelo
+### Model tiers
 
-| Nivel | Uso | Ejemplo Claude | Ejemplo Gemini |
-|-------|-----|----------------|----------------|
-| **high** | Decisiones complejas (PM, Architect) | Opus | gemini-2.5-pro |
-| **medium** | Implementacion (Developer, Tester) | Sonnet | gemini-2.5-flash |
-| **low** | Tareas simples (Reporter) | Haiku | gemini-2.5-flash-lite |
+| Tier | Use case | Claude example | Gemini example |
+|------|----------|----------------|----------------|
+| **high** | Complex decisions (PM, Architect) | Opus | gemini-2.5-pro |
+| **medium** | Implementation (Developer, Tester) | Sonnet | gemini-2.5-flash |
+| **low** | Simple tasks (Reporter) | Haiku | gemini-2.5-flash-lite |
 
 ## Skills
 
-Las skills son modulos de conocimiento que se cargan bajo demanda segun la tarea.
+Skills are loadable knowledge modules. Agents load them on-demand based on the task.
 
-### Convenciones por Stack
+### Per-Stack Conventions
 
-| Skill | Cubre |
-|-------|-------|
-| `/go-conventions` | Manejo de errores, validacion, SQL, concurrencia, testing, Kafka, RabbitMQ |
-| `/react-conventions` | Hooks, estado, Tailwind v4, accesibilidad, testing, anti-patrones |
-| `/flutter-conventions` | BLoC/Riverpod, composicion de widgets, theming, testing |
-| `/astro-conventions` | Islands, content collections, componentes, estilos |
+| Skill | Covers |
+|-------|--------|
+| `/go-conventions` | Error handling, validation, SQL, concurrency, testing, Kafka, RabbitMQ |
+| `/react-conventions` | Hooks, state management, Tailwind v4, accessibility, testing, anti-patterns |
+| `/flutter-conventions` | BLoC/Riverpod, widget composition, theming, testing |
+| `/astro-conventions` | Islands, content collections, components, styling |
 | `/devops-conventions` | Docker, GitHub Actions, Terraform, K8s, AWS, GCP, Argo CD/Workflows/Rollouts |
 
-### Skills de Workflow
+### Workflow Skills
 
-| Skill | Proposito |
-|-------|-----------|
-| `/orchestrate` | Clasificar complejidad, seleccionar agentes, gestionar gates |
-| `/lint` | Auto-detecta stack, corre linters y formatters |
-| `/run-tests` | Auto-detecta stack, corre tests con cobertura |
-| `/design-system` | Crear tokens, variables, componentes (Pencil/Figma) |
-| `/design-review` | Auditoria de calidad de disenos con puntaje |
-| `/design-to-code` | Traducir disenos a codigo de produccion |
-| `/prd-template` | Escritura de PRD con cuestionario de descubrimiento |
-| `/backlog-management` | Dividir PRDs en tickets, gestionar sprints |
+| Skill | Purpose |
+|-------|---------|
+| `/orchestrate` | Triage complexity, select agents, manage gates |
+| `/lint` | Auto-detect stack, run linters and formatters |
+| `/run-tests` | Auto-detect stack, run tests with coverage |
+| `/design-system` | Create design tokens, variables, components (Pencil/Figma) |
+| `/design-review` | Quality audit of designs with scoring |
+| `/design-to-code` | Translate designs to production code |
+| `/prd-template` | PRD writing with discovery questionnaire |
+| `/backlog-management` | Break PRDs into tickets, manage sprints |
 
-### Skills de Guardia
+### Guard Skills
 
-| Skill | Proposito |
-|-------|-----------|
-| `/architecture-boundary-guardrails` | Enforzar bounded contexts, prevenir leaks entre dominios |
-| `/domain-entity-guardrails` | Tipado estricto, sin punteros para campos opcionales |
-| `/code-review-rubric` | Criterios de puntuacion para reviews de QA |
+| Skill | Purpose |
+|-------|---------|
+| `/architecture-boundary-guardrails` | Enforce bounded contexts, prevent cross-domain leaks |
+| `/domain-entity-guardrails` | Strict typing, no pointers for optional fields |
+| `/code-review-rubric` | Scoring criteria for QA reviews |
 
-### Skills de Utilidad
+### Utility Skills
 
-| Skill | Proposito |
-|-------|-----------|
-| `/dependency-check` | Auditar paquetes por vulnerabilidades y licencias |
-| `/bundle-analyzer` | Analisis de impacto en tamano de bundle frontend |
-| `/db-schema-scan` | Inspeccion read-only de schema via migraciones |
-| `/db-optimize` | Identificar queries lentos, sugerir indices |
-| `/generate-diagram` | Diagramas Mermaid.js (C4, ERD, secuencia, flujo) |
-| `/git-diff` | Resumir cambios del repositorio |
-| `/service-map` | Dependencias entre microservicios |
-| `/a11y-check` | Auditoria de accesibilidad WCAG 2.1 |
-| `/test-api` | Validacion de contratos de API endpoints |
-| `/ui-component-scan` | Escanear libreria de componentes para reusar |
+| Skill | Purpose |
+|-------|---------|
+| `/dependency-check` | Audit packages for vulnerabilities and licenses |
+| `/bundle-analyzer` | Frontend bundle size impact analysis |
+| `/db-schema-scan` | Read-only schema inspection via migrations |
+| `/db-optimize` | Slow query identification, index suggestions |
+| `/generate-diagram` | Mermaid.js diagrams (C4, ERD, sequence, flow) |
+| `/git-diff` | Summarize repository changes |
+| `/service-map` | Cross-service dependency awareness |
+| `/a11y-check` | WCAG 2.1 accessibility audit |
+| `/test-api` | API endpoint contract validation |
+| `/ui-component-scan` | Scan component library for reuse |
 
-## Referencia del CLI
+## CLI Reference
 
 ```bash
-# Despliegue
-forge-cli deploy                     # Desplegar todos los componentes a targets activos
-forge-cli status                     # Mostrar que esta desplegado donde
+# Deployment
+forge-cli deploy                     # Deploy all components to active targets
+forge-cli status                     # Show what's deployed where
 
-# Targets (a que herramientas desplegar)
-forge-cli targets                    # Mostrar targets activos
-forge-cli targets claude opencode    # Definir targets exactos
-forge-cli targets --add gemini       # Habilitar un target
-forge-cli targets --rm cursor        # Deshabilitar un target
-forge-cli targets all                # Habilitar todos
+# Targets (which AI tools to deploy to)
+forge-cli targets                    # Show active targets
+forge-cli targets claude opencode    # Set exact targets
+forge-cli targets --add gemini       # Enable one target
+forge-cli targets --rm cursor        # Disable one target
+forge-cli targets all                # Enable all
 
-# Provider (mapeo de modelos)
-forge-cli provider                   # Mostrar provider actual
-forge-cli provider gemini            # Cambiar a modelos Gemini
-forge-cli provider local             # Cambiar a modelos locales/Ollama
+# Provider (model mapping)
+forge-cli provider                   # Show current provider
+forge-cli provider gemini            # Switch to Gemini models
+forge-cli provider local             # Switch to local/Ollama models
 
-# Versionado
-forge-cli pin skills/go-conventions v1.2.0    # Fijar a un git tag
-forge-cli unpin skills/go-conventions         # Volver a seguir HEAD
+# Version pinning
+forge-cli pin skills/go-conventions v1.2.0    # Pin to git tag
+forge-cli unpin skills/go-conventions         # Follow HEAD again
 
-# Mantenimiento
-forge-cli diff                       # Mostrar cambios desde ultimo deploy
-forge-cli uninstall                  # Remover de todos los targets
+# Maintenance
+forge-cli diff                       # Show changes since last deploy
+forge-cli uninstall                  # Remove from all targets
 ```
 
-## Configuracion
+## Configuration
 
-### `forge.yaml` — Manifiesto de despliegue
-
-Define que targets estan habilitados y que componentes desplegar:
+### `forge.yaml` — Deployment manifest
 
 ```yaml
 targets:
@@ -193,16 +192,14 @@ targets:
 
 components:
   agents:
-    tag: "HEAD"      # Sigue la rama actual
+    tag: "HEAD"
   skills:
     tag: "HEAD"
   commands:
     tag: "HEAD"
 ```
 
-### `forge.config.yaml` — Mapeo de proveedores y modelos
-
-Mapea los niveles de agentes (high/medium/low) a nombres de modelos reales por proveedor:
+### `forge.config.yaml` — Provider & model mapping
 
 ```yaml
 provider: claude
@@ -222,123 +219,115 @@ providers:
     low: qwen3:8b
 ```
 
-## Crear Nuevos Agentes
+## Backup & Restore
 
-Crear `agents/{nombre}.md`:
+Forge automatically protects your existing files:
+
+- **First deploy**: snapshots everything found in `~/.claude/`, `~/.codex/`, etc.
+- **Each deploy**: timestamps backup if it detects manual changes
+- **Uninstall**: restores original files from the snapshot
+
+See [full section in the manual](docs/manual.md#8-backup--restore).
+
+## AGENTS.md Compatibility
+
+[AGENTS.md](https://agents.md/) is an open standard maintained by the Linux Foundation for configuring AI agents in software projects. Forge generates this file automatically on every `forge deploy`.
+
+### Which tools read it?
+
+| Tool | Reads AGENTS.md | Native file |
+|---|---|---|
+| **OpenAI Codex** | Yes (primary) | `~/.codex/AGENTS.md` |
+| **Cursor** | Yes (repo root) | `.cursor/rules/*.mdc` |
+| **GitHub Copilot** | Via `.github/copilot-instructions.md` | `.github/agents/*.agent.md` |
+| **OpenCode** | Yes (primary) | — |
+| **Claude Code** | No (uses `CLAUDE.md`) | `~/.claude/agents/*.md` |
+| **Gemini CLI** | Discussion active | `GEMINI.md` |
+
+### How it works in Forge
+
+1. Define agents in `agents/*.md` with frontmatter (role, permissions, tier)
+2. On `forge deploy`, Forge:
+   - Deploys native agents to each target (Claude, OpenCode, Gemini, etc.)
+   - Generates compact `AGENTS.md` to `~/.codex/` for Codex
+3. Any AGENTS.md-compatible tool can read the generated file
+
+## Creating New Agents
+
+Create `agents/{name}.md`:
 
 ```markdown
 ---
-name: mi-agente
-description: Descripcion en una linea que el sistema usa para decidir cuando invocar este agente
+name: my-agent
+description: One-line description the system uses to decide when to invoke this agent
 permission: execute    # read | write | execute
 model: medium          # high | medium | low
 ---
 
-# Agent Spec — Titulo del Rol
+# Agent Spec — Role Title
 
 ## Role
-Que hace este agente y que NO hace.
+What this agent does and what it does NOT do.
 
 ## Input
-Que le proporciona el orquestador.
+What the orchestrator provides.
 
 ## Rules
-Restricciones y permisos especificos.
+Specific constraints and permissions.
 
 ## Output
-Que produce y donde lo escribe.
+What it produces and where.
 ```
 
-## Crear Nuevas Skills
+## Creating New Skills
 
-Crear `skills/{nombre}/SKILL.md`:
+Create `skills/{name}/SKILL.md`:
 
 ```markdown
 ---
-name: mi-skill
-description: Descripcion en una linea de lo que enseña esta skill
+name: my-skill
+description: One-line description of what this skill teaches
 ---
 
-# Nombre de la Skill
+# Skill Name
 
 ## When to Load
-Condiciones que disparan la carga de esta skill.
+Conditions that trigger loading this skill.
 
-## Contenido
-El conocimiento, convenciones y patrones.
+## Content
+The actual knowledge, conventions, and patterns.
 ```
 
-Para skills complejas, usar subdirectorios con tabla de ruteo:
+For complex skills, use subdirectories with a routing table:
 
 ```
-skills/mi-skill/
-├── SKILL.md           # Dispatcher con tabla de ruteo
-├── rules/             # Archivos de referencia rapida
-├── guides/            # Patrones detallados
-└── examples/          # Patrones buenos y malos
+skills/my-conventions/
+├── SKILL.md           # Dispatcher with routing table
+├── rules/             # Quick reference files
+├── guides/            # Detailed patterns
+└── examples/          # Good + bad patterns
 ```
 
-## Vault de Documentacion
+## Documentation Vault
 
-Usar `vault-template/` para inicializar un vault Obsidian en cualquier proyecto:
+Use `vault-template/` to bootstrap an Obsidian vault for any project:
 
 ```bash
-cp -r vault-template/ ~/projects/mi-proyecto-knowledge-base/
+cp -r vault-template/ ~/projects/my-project-knowledge-base/
 ```
 
-Estructura:
+Structure:
 ```
-01-project/context.md         # Output del scanner
-02-backlog/sprint-current.md  # Board del sprint
-03-tasks/<ID>/                # PRD, design, QA por tarea
+01-project/context.md         # Scanner output
+02-backlog/sprint-current.md  # Sprint board
+03-tasks/<ID>/                # PRD, design, QA per task
 04-architecture/              # ADRs, bounded contexts
 05-bugs/                      # Postmortems
-06-reports/last-run.md        # Reportes de sesion
-07-references/                # Templates, links externos
-08-design/                    # Archivos de diseno (.pen, .fig)
+06-reports/last-run.md        # Session reports
+07-references/                # Templates, external links
+08-design/                    # Design files (.pen, .fig)
 ```
 
-## Backup y Restauracion
-
-Forge protege tus archivos existentes automaticamente:
-
-- **Primer deploy**: guarda snapshot de todo lo que encuentra en `~/.claude/`, `~/.codex/`, etc.
-- **Cada deploy**: hace backup con timestamp si detecta cambios manuales
-- **Uninstall**: restaura los archivos originales desde el snapshot
-
-Ver [seccion completa en el manual](docs/manual-de-uso.md#8-backup-y-restauracion).
-
-## Compatibilidad con AGENTS.md
-
-[AGENTS.md](https://agents.md/) es un estandar abierto mantenido por la Linux Foundation para configurar agentes de IA en proyectos de software. Forge genera automaticamente este archivo cada vez que ejecutas `forge deploy`.
-
-### Que herramientas lo leen?
-
-| Herramienta | Lee AGENTS.md | Archivo nativo |
-|---|---|---|
-| **OpenAI Codex** | Si (primario) | `~/.codex/AGENTS.md` |
-| **Cursor** | Si (en raiz del repo) | `.cursor/rules/*.mdc` |
-| **GitHub Copilot** | Via `.github/copilot-instructions.md` | `.github/agents/*.agent.md` |
-| **OpenCode** | Si (primario) | — |
-| **Claude Code** | No (usa `CLAUDE.md`) | `~/.claude/agents/*.md` |
-| **Gemini CLI** | Discusion activa | `GEMINI.md` |
-
-### Como funciona en Forge
-
-1. Defines agentes en `agents/*.md` con frontmatter (rol, permisos, nivel)
-2. Al hacer `forge deploy`, Forge:
-   - Despliega agentes nativos a cada target (Claude, OpenCode, Gemini, etc.)
-   - Genera `AGENTS.md` en la raiz del repo compilando todos los agentes
-   - Copia `AGENTS.md` a `~/.codex/` para Codex
-3. Cualquier herramienta compatible con AGENTS.md puede leer el archivo generado
-
-### Generar manualmente
-
-```bash
-# El deploy lo genera automaticamente, pero tambien puedes:
-./forge-cli deploy    # Genera AGENTS.md + despliega todo
-```
-
-## Licencia
+## License
 
 MIT

@@ -1,3 +1,5 @@
+[Read in English](manual.md)
+
 # Manual de Uso — Forge
 
 Guia practica para usar Forge en tu dia a dia. Desde instalar hasta orquestar agentes en un proyecto real.
