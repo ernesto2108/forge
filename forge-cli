@@ -678,11 +678,6 @@ cmd_deploy() {
   echo ""
   target_enabled cursor   && deploy_to_cursor
 
-  # Generate AGENTS.md at repo root (always, for compatibility)
-  generate_agents_md "$SCRIPT_DIR/AGENTS.md"
-  info "AGENTS.md → generated at repo root"
-  echo ""
-
   # Update state
   local active_provider
   active_provider=$(yaml_get "provider" 2>/dev/null || echo "unknown")
