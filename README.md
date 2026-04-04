@@ -21,28 +21,26 @@ For a complete guide on daily usage — invoking skills, using agents, typical w
 git clone https://github.com/ernesto2108/forge.git ~/projects/forge
 cd ~/projects/forge
 
-# 2. Make the CLI available globally (pick one)
-# Option A: symlink (recommended)
-ln -sf ~/projects/forge/forge-cli /usr/local/bin/forge
+# 2. Build the CLI (requires Go 1.25+)
+make build
 
-# Option B: alias in your shell profile (~/.zshrc or ~/.bashrc)
-echo 'alias forge="~/projects/forge/forge-cli"' >> ~/.zshrc
-source ~/.zshrc
+# 3. Make it available globally (optional)
+ln -sf ~/projects/forge/forge /usr/local/bin/forge
 
-# 3. Choose your targets (which tools to deploy to)
+# 4. Choose your targets (which tools to deploy to)
 forge targets claude opencode    # or: all
 
-# 4. Choose your provider (model tier mapping)
+# 5. Choose your provider (model tier mapping)
 forge provider claude            # or: gemini, local
 
-# 5. Deploy
+# 6. Deploy
 forge deploy
 
-# 6. Verify
+# 7. Verify
 forge status
 ```
 
-> After step 2, you can run `forge` from anywhere. If you skip it, use `./forge-cli` from the forge directory.
+> After step 3, you can run `forge` from anywhere. If you skip it, use `./forge` from the forge directory.
 
 ## How It Works
 
@@ -81,7 +79,8 @@ Each agent has strict boundaries:
 
 ```
 forge/
-├── forge-cli              # Deployment CLI (bash)
+├── cmd/forge/             # CLI entry point (Go)
+├── internal/              # Core packages (config, deploy, state, etc.)
 ├── forge.yaml             # Deployment manifest (targets, components)
 ├── forge.config.yaml      # Provider & model mapping
 ├── agents/                # 12 specialized agent definitions
@@ -188,28 +187,28 @@ Skills are loadable knowledge modules. Agents load them on-demand based on the t
 
 ```bash
 # Deployment
-forge-cli deploy                     # Deploy all components to active targets
-forge-cli status                     # Show what's deployed where
+forgedeploy                     # Deploy all components to active targets
+forgestatus                     # Show what's deployed where
 
 # Targets (which AI tools to deploy to)
-forge-cli targets                    # Show active targets
-forge-cli targets claude opencode    # Set exact targets
-forge-cli targets --add gemini       # Enable one target
-forge-cli targets --rm cursor        # Disable one target
-forge-cli targets all                # Enable all
+forgetargets                    # Show active targets
+forgetargets claude opencode    # Set exact targets
+forgetargets --add gemini       # Enable one target
+forgetargets --rm cursor        # Disable one target
+forgetargets all                # Enable all
 
 # Provider (model mapping)
-forge-cli provider                   # Show current provider
-forge-cli provider gemini            # Switch to Gemini models
-forge-cli provider local             # Switch to local/Ollama models
+forgeprovider                   # Show current provider
+forgeprovider gemini            # Switch to Gemini models
+forgeprovider local             # Switch to local/Ollama models
 
 # Version pinning
-forge-cli pin skills/go-conventions v1.2.0    # Pin to git tag
-forge-cli unpin skills/go-conventions         # Follow HEAD again
+forgepin skills/go-conventions v1.2.0    # Pin to git tag
+forgeunpin skills/go-conventions         # Follow HEAD again
 
 # Maintenance
-forge-cli diff                       # Show changes since last deploy
-forge-cli uninstall                  # Remove from all targets
+forgediff                       # Show changes since last deploy
+forgeuninstall                  # Remove from all targets
 ```
 
 ## Configuration

@@ -21,28 +21,26 @@ Para una guia completa de como usar Forge en el dia a dia — invocar skills, us
 git clone https://github.com/ernesto2108/forge.git ~/projects/forge
 cd ~/projects/forge
 
-# 2. Hacer el CLI disponible globalmente (elige uno)
-# Opcion A: symlink (recomendado)
-ln -sf ~/projects/forge/forge-cli /usr/local/bin/forge
+# 2. Compilar el CLI (requiere Go 1.25+)
+make build
 
-# Opcion B: alias en tu perfil de shell (~/.zshrc o ~/.bashrc)
-echo 'alias forge="~/projects/forge/forge-cli"' >> ~/.zshrc
-source ~/.zshrc
+# 3. Hacerlo disponible globalmente (opcional)
+ln -sf ~/projects/forge/forge /usr/local/bin/forge
 
-# 3. Elegir targets (a que herramientas desplegar)
+# 4. Elegir targets (a que herramientas desplegar)
 forge targets claude opencode    # o: all
 
-# 4. Elegir provider (mapeo de modelos)
+# 5. Elegir provider (mapeo de modelos)
 forge provider claude            # o: gemini, local
 
-# 5. Desplegar
+# 6. Desplegar
 forge deploy
 
-# 6. Verificar
+# 7. Verificar
 forge status
 ```
 
-> Despues del paso 2, puedes ejecutar `forge` desde cualquier lugar. Si lo omites, usa `./forge-cli` desde el directorio de forge.
+> Despues del paso 3, puedes ejecutar `forge` desde cualquier lugar. Si lo omites, usa `./forge` desde el directorio de forge.
 
 ## Como Funciona
 
@@ -81,7 +79,8 @@ Cada agente tiene limites estrictos:
 
 ```
 forge/
-├── forge-cli              # CLI de despliegue (bash)
+├── cmd/forge/             # CLI de despliegue (Go)
+├── internal/              # Paquetes core (config, deploy, state, etc.)
 ├── forge.yaml             # Manifiesto de despliegue (targets, componentes)
 ├── forge.config.yaml      # Mapeo de proveedores y modelos
 ├── AGENTS.md              # Auto-generado — estandar abierto para herramientas IA
@@ -189,28 +188,28 @@ Las skills son modulos de conocimiento que se cargan bajo demanda segun la tarea
 
 ```bash
 # Despliegue
-forge-cli deploy                     # Desplegar todos los componentes a targets activos
-forge-cli status                     # Mostrar que esta desplegado donde
+forgedeploy                     # Desplegar todos los componentes a targets activos
+forgestatus                     # Mostrar que esta desplegado donde
 
 # Targets (a que herramientas desplegar)
-forge-cli targets                    # Mostrar targets activos
-forge-cli targets claude opencode    # Definir targets exactos
-forge-cli targets --add gemini       # Habilitar un target
-forge-cli targets --rm cursor        # Deshabilitar un target
-forge-cli targets all                # Habilitar todos
+forgetargets                    # Mostrar targets activos
+forgetargets claude opencode    # Definir targets exactos
+forgetargets --add gemini       # Habilitar un target
+forgetargets --rm cursor        # Deshabilitar un target
+forgetargets all                # Habilitar todos
 
 # Provider (mapeo de modelos)
-forge-cli provider                   # Mostrar provider actual
-forge-cli provider gemini            # Cambiar a modelos Gemini
-forge-cli provider local             # Cambiar a modelos locales/Ollama
+forgeprovider                   # Mostrar provider actual
+forgeprovider gemini            # Cambiar a modelos Gemini
+forgeprovider local             # Cambiar a modelos locales/Ollama
 
 # Versionado
-forge-cli pin skills/go-conventions v1.2.0    # Fijar a un git tag
-forge-cli unpin skills/go-conventions         # Volver a seguir HEAD
+forgepin skills/go-conventions v1.2.0    # Fijar a un git tag
+forgeunpin skills/go-conventions         # Volver a seguir HEAD
 
 # Mantenimiento
-forge-cli diff                       # Mostrar cambios desde ultimo deploy
-forge-cli uninstall                  # Remover de todos los targets
+forgediff                       # Mostrar cambios desde ultimo deploy
+forgeuninstall                  # Remover de todos los targets
 ```
 
 ## Configuracion
@@ -381,7 +380,7 @@ Ver [seccion completa en el manual](docs/manual.es.md#8-backup-y-restauracion).
 
 ```bash
 # El deploy lo genera automaticamente, pero tambien puedes:
-./forge-cli deploy    # Genera AGENTS.md + despliega todo
+./forgedeploy    # Genera AGENTS.md + despliega todo
 ```
 
 ## Licencia
