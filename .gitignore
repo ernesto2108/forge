@@ -1,2 +1,6 @@
 .forge/
 AGENTS.md
+
+# Go binaries
+/forge
+/anvil
