@@ -26,6 +26,9 @@ description: React/TypeScript frontend conventions and coding standards. Use whe
 - Accessibility first (ARIA attributes, semantic HTML, keyboard navigation)
 - Predictable state (avoid derived state, single source of truth)
 - No business logic in UI components — extract to custom hooks
+- No form logic (types, validation, state) in components — extract to `useXxxForm` hook
+- Before creating a helper/util, grep for it — if it exists in another feature, extract to `shared/utils/`
+- One error channel per action — toast for API errors, inline for field validation. Never both
 - Named exports preferred over default exports (except pages/layouts in Next.js)
 
 ## TypeScript Rules

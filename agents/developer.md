@@ -101,6 +101,38 @@ Only invoke when The orchestrator specifies it:
 - Run build and lint via `/lint` skill (auto-detects stack)
 - Run existing tests via `/run-tests` skill to verify no regressions
 - Report changed files and what was done
+- Run doc impact detection (see below)
+
+## Doc Impact Detection
+
+After implementation, check if the changed files include any of these:
+
+| Changed file type | Stack | Doc impact |
+|---|---|---|
+| HTTP handler, route, middleware | Go | Endpoint doc |
+| Response/request DTO or struct | Go | Endpoint contract |
+| Page, route config, lazy import | React / Astro | Routes or screens doc |
+| Service, hook, API client | React / Flutter | Integration doc |
+| Widget, BLoC, repository | Flutter | Mobile feature doc |
+| Content collection, config | Astro | Content/CMS doc |
+| Migration, schema SQL | Any | ERD or schema doc |
+| Service interface, port | Any | Architecture doc |
+| New bounded context or module | Any | Context map doc |
+
+**If doc impact is detected:**
+
+1. List which files changed and what the doc impact is
+2. Ask the user **in Spanish**: "Estos cambios pueden afectar documentación: [lista]. ¿Quieres que actualice la doc?"
+3. **Wait for the user's response** — never auto-apply
+4. The user may approve, deny, or provide adjustments in their response (e.g., "sí pero cambia la descripción a X", "sí pero agrega los códigos de error")
+5. If approved, locate the doc using the project-registry routing rules and update only the affected sections
+6. Show changes to the user before writing — let them review
+7. If no doc exists for the affected endpoint/feature, ask in Spanish: "No encontré doc existente para [X]. ¿Quieres que la cree? Si necesitas documentar el proyecto completo puedo usar `/document-architecture`"
+
+**Do NOT:**
+- Update docs silently without asking
+- Skip this step because the task was small
+- Assume the doc location — check the project-registry
 
 ## Stack-Specific Rules
 

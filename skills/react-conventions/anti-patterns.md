@@ -18,6 +18,9 @@
 | Direct DOM mutation (`document.getElementById`) | dom-bypass | architecture | Use refs (`useRef`) or state |
 | Circular imports between modules | circular-deps | modules | Extract shared interface to third module |
 | Inline SVG icons in components (`<svg>...</svg>`) | inline-svg-icons | maintenance | Use `lucide-react` icon components with `size` prop |
+| `showToast(error)` + `{isError && <p>error</p>}` for same error | dual-error-feedback | ux | Choose one channel: toast for API errors, inline for field validation |
+| Helper/constant duplicated across features | duplicated-util | maintenance | Extract to `shared/utils/` before creating, grep first |
+| Form types + validation + state logic inside component | form-logic-in-view | architecture | Extract to `useXxxForm` hook; component is pure UI |
 | `import * as icons from 'lucide-react'` | icon-barrel-import | performance | Import individual icons: `import { User } from 'lucide-react'` |
 | `[var(--X)]` in Tailwind className | tailwind-v3-var-syntax | style | Use `(--X)` parenthesis syntax for Tailwind v4 |
 | `w-[16px]` when `w-4` exists | unnecessary-arbitrary-value | style | Use standard Tailwind class instead of arbitrary value |
@@ -79,6 +82,15 @@ import.*useSelector|useDispatch.*from.*react-redux → direct store access in co
 
 # barrel-export
 export \* from → barrel re-export
+
+# dual-error-feedback
+showToast.*error.*\n.*isError.*&& → toast + inline for same error
+
+# form-logic-in-view (in component files)
+^interface Form\w+|^function validate\w+|^type Form\w+ → form types/logic in component file
+
+# duplicated-util
+function (formatDate|truncateId|timeAgo|isValidEmail) → check if already exists in shared/utils
 ```
 
 ---
@@ -87,6 +99,9 @@ export \* from → barrel re-export
 
 | Anti-Pattern | Recommended Pattern | Guide |
 |---|---|---|
+| dual-error-feedback | Toast only for API errors, inline for field validation | — |
+| duplicated-util | `shared/utils/` extraction | — |
+| form-logic-in-view | `useXxxForm` hook pattern | `patterns-guide.md` |
 | boolean-hell | State Machine | `patterns-guide.md` |
 | prop-drilling | Facade Hook / Context | `patterns-guide.md`, `state-management-guide.md` |
 | store-coupling | Facade Hook | `patterns-guide.md` |
